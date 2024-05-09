@@ -1,18 +1,29 @@
-import React, { useState } from "react";
-import { StyleSheet, Text, View, Image } from "react-native";
+import React, { useState, useEffect } from "react";
+import { StyleSheet, Text, View, Image, Alert } from "react-native";
 import RNPickerSelect from "react-native-picker-select";
 
 const CurrencyRate = () => {
-  const [selectedCountry, setSelectedCountry] = useState("Nepal"); // Default country selection
-  const [currencies, setCurrencies] = useState({
-    Nepal: "NPR", 
-    USA: "USD", 
-    UK: "GBP", 
-  });
-
-  const handleCountryChange = (value) => {
-    setSelectedCountry(value);
-  };
+  const [currencyData, setCurrencyData] = useState([]);
+  const [selectedCountry, setSelectedCountry] = useState("USA");
+  useEffect(() => {
+    const fetchCurrencyData = async () => {
+      try {
+        const response = await fetch(
+          "https://macalistair1.github.io/scrap-data/currency.json"
+        );
+        const data = await response.json();
+        setCurrencyData(data);
+      } catch (error) {
+        console.error("Failed to fetch currency data:", error);
+        Alert.alert("Error", "Failed to fetch currency data");
+      }
+    };
+    fetchCurrencyData();
+  }, []);
+  // const selectedCurrency = currencyData.find(
+  //   (item) => item.code === currecies[selectedCountry]
+  // )
+  const selectedCurrency = currencyData.find(item => item.code === selectedCountry);
 
   return (
     <View style={styles.container}>
@@ -27,17 +38,27 @@ const CurrencyRate = () => {
         <Text style={styles.label}>Country</Text>
         <RNPickerSelect
           value={selectedCountry}
-          onValueChange={handleCountryChange}
-          items={Object.keys(currencies).map((country) => ({
-            label: country,
-            value: country,
+          onValueChange={(value) => setSelectedCountry(value)}
+          items={currencyData.map((item) => ({
+            label: item.name,
+            value: item.code,
           }))}
           style={pickerSelectStyles}
         />
       </View>
       <View style={styles.optionContainer}>
-        <Text style={styles.label}> Nepali Rate</Text>
-        <Text>{currencies[selectedCountry]}</Text>
+        <Text style={styles.label}>Currency Code</Text>
+        <Text>
+          {selectedCurrency ? selectedCurrency.code : "Select a country"}
+        </Text>
+      </View>
+      <View style={styles.optionContainer}>
+        <Text style={styles.label}>Buy Rate</Text>
+        <Text>{selectedCurrency ? `Rs. ${selectedCurrency.buy}` : "-"}</Text>
+      </View>
+      <View style={styles.optionContainer}>
+        <Text style={styles.label}>Sell Rate</Text>
+        <Text>{selectedCurrency ? `Rs. ${selectedCurrency.sell}` : "-"}</Text>
       </View>
     </View>
   );
@@ -87,14 +108,15 @@ const styles = StyleSheet.create({
 
 const pickerSelectStyles = StyleSheet.create({
   inputIOS: {
-    fontSize: 16,
+    fontSize: 20,
     paddingVertical: 12,
     paddingHorizontal: 10,
     borderWidth: 1,
     borderColor: "gray",
     borderRadius: 4,
     color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
+    paddingRight: 30,
+  
   },
   inputAndroid: {
     fontSize: 16,
@@ -104,8 +126,7 @@ const pickerSelectStyles = StyleSheet.create({
     borderColor: "purple",
     borderRadius: 8,
     color: "black",
-    paddingRight: 30, // to ensure the text is never behind the icon
+    height:100,
   },
 });
-
 export default CurrencyRate;
