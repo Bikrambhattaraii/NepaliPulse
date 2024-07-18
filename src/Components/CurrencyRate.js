@@ -5,14 +5,21 @@ import RNPickerSelect from "react-native-picker-select";
 const CurrencyRate = () => {
   const [currencyData, setCurrencyData] = useState([]);
   const [selectedCountry, setSelectedCountry] = useState("USA");
+  
   useEffect(() => {
     const fetchCurrencyData = async () => {
       try {
-        const response = await fetch(
-          "https://macalistair1.github.io/scrap-data/currency.json"
-        );
-        const data = await response.json();
+        const response = await fetch("https://macalistair1.github.io/scrap-data/currency.json");
+        let data = await response.json();
+        
+        data.sort((a, b) => {
+          if (a.code === 'USA') return -1;
+          if (b.code === 'USA') return 1;
+          return a.name.localeCompare(b.name);
+        });
+
         setCurrencyData(data);
+        setSelectedCountry('USA');
       } catch (error) {
         console.error("Failed to fetch currency data:", error);
         Alert.alert("Error", "Failed to fetch currency data");
@@ -20,10 +27,8 @@ const CurrencyRate = () => {
     };
     fetchCurrencyData();
   }, []);
-  // const selectedCurrency = currencyData.find(
-  //   (item) => item.code === currecies[selectedCountry]
-  // )
-  const selectedCurrency = currencyData.find(item => item.code === selectedCountry);
+
+  const selectedCurrency = currencyData.find(item => item.code === selectedCountry) || {};
 
   return (
     <View style={styles.container}>
@@ -48,17 +53,15 @@ const CurrencyRate = () => {
       </View>
       <View style={styles.optionContainer}>
         <Text style={styles.label}>Currency Code</Text>
-        <Text>
-          {selectedCurrency ? selectedCurrency.code : "Select a country"}
-        </Text>
+        <Text>{selectedCurrency.code || "Select a country"}</Text>
       </View>
       <View style={styles.optionContainer}>
         <Text style={styles.label}>Buy Rate</Text>
-        <Text>{selectedCurrency ? `Rs. ${selectedCurrency.buy}` : "-"}</Text>
+        <Text>{selectedCurrency.buy ? `Rs. ${selectedCurrency.buy}` : "-"}</Text>
       </View>
       <View style={styles.optionContainer}>
         <Text style={styles.label}>Sell Rate</Text>
-        <Text>{selectedCurrency ? `Rs. ${selectedCurrency.sell}` : "-"}</Text>
+        <Text>{selectedCurrency.sell ? `Rs. ${selectedCurrency.sell}` : "-"}</Text>
       </View>
     </View>
   );
@@ -116,7 +119,6 @@ const pickerSelectStyles = StyleSheet.create({
     borderRadius: 4,
     color: "black",
     paddingRight: 30,
-  
   },
   inputAndroid: {
     fontSize: 16,
@@ -126,7 +128,7 @@ const pickerSelectStyles = StyleSheet.create({
     borderColor: "purple",
     borderRadius: 8,
     color: "black",
-    height:100,
+    height: 100,
   },
 });
 export default CurrencyRate;

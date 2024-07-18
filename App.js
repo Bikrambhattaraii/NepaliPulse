@@ -17,18 +17,17 @@ export default function App() {
         <View style={styles.card}>
           <OilCorporation />
           <View style={styles.smallcontainer}>
-          <Sharemarket />
-          <TopMusic />
-       </View>   
-       <JwelleryPrice />
-       <CurrencyRate />
-       <BankRate />
+            <Sharemarket />
+            <TopMusic />
+          </View>
+          <JwelleryPrice />
+          <CurrencyRate />
+          <BankRate />
         </View>
       </ScrollView>
     </View>
   );
 }
-
 
 const styles = StyleSheet.create({
   container: {
@@ -44,11 +43,11 @@ const styles = StyleSheet.create({
     marginBottom: 20,
     backgroundColor: "#f0f0f0",
     borderRadius: 10,
-    gap:10,
+    gap: 10,
   },
-  smallcontainer:{
-display:'flex',
-flexDirection:'row',
-gap:50,
+  smallcontainer: {
+    display: "flex",
+    flexDirection: "row",
+    gap: 50,
   },
 });
